@@ -49,10 +49,23 @@ Canal punto a punto, publicación-suscripción, identificador de correlación, i
 |---|---|
 | Runtime y desarrollo | Mule 4, Anypoint Studio |
 | Contratos | RAML 1.0, publicados en Anypoint Exchange |
-| Mensajería | Broker JMS (ActiveMQ, versión por definir) |
+| Mensajería | ActiveMQ Classic 5.19 en Docker (local) |
 | Pruebas | MUnit |
-| Base de datos | Por definir |
+| Base de datos | PostgreSQL en Docker |
 | Pasarela de pago | API mock (se simula MercadoPago) |
+
+### Base de datos (MDX-001)
+
+- **PostgreSQL**, porque separa de verdad las bases de cada API (no deja consultar entre bases distintas) y guarda en `jsonb` las listas que se leen enteras.
+- **Un solo contenedor con una base de datos por System API**, cada una con su propio usuario: `clientes`, `tiendas`, `catalogo`, `pedidos`, `pagos` y `logistica`. Cada API solo se conecta a la suya.
+- **Listas dentro de un objeto:** columna `jsonb` si la lista se lee y se reemplaza entera y nunca se filtra por algo de adentro (ejemplo: el `horario` de la Tienda); tabla aparte (uno a muchos) si se filtra o se busca por algo de adentro, o se agregan filas una a una (ejemplos: el `historial` de la Parte y las `tiendas` de un Producto).
+
+### Broker de mensajes (MDX-002)
+
+- **ActiveMQ Classic 5.19** (imagen `apache/activemq-classic:5.19.2`), elegido tras probar Classic y Artemis: conexión propia en Mule («ActiveMQ Connection», JMS 1.1), las alarmas programadas se ven en la consola (pestaña Scheduled) y no deja errores al redesplegar.
+- **Mensaje diferido** (alarmas de 5 y 2 min): el broker necesita `schedulerSupport="true"`, y el Publish de Mule pone el retraso en *User Properties* con `output application/java` y `{AMQ_SCHEDULED_DELAY: <milisegundos>}`. El campo *Delivery delay* del Publish no sirve con Classic (es de JMS 2.0).
+- **Mensaje vencido:** por defecto Classic lo manda a `ActiveMQ.DLQ`; para descartarlo hay que configurar `processExpired="false"`.
+- **Solo para local.** En la nube el broker vive aparte de CloudHub; está por decidir (historia MDX-050).
 
 ## Estructura del repositorio
 

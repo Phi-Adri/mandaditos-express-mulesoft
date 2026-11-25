@@ -1,0 +1,12 @@
+# Workspace de pruebas de Anypoint Studio (no es código del proyecto)
+pruebas_codigo_en_mule/
+
+# Archivos que genera Studio y Maven en cada proyecto de Mule
+target/
+.metadata/
+.mule/
+.tooling/
+.tooling-apps-cache/
+
+# Variables locales con claves (si se usan más adelante)
+.env

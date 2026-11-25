@@ -1,0 +1,37 @@
+# Servicios locales de Mandaditos Express (fase 4).
+# Levantar desde la carpeta codigo:  docker compose up -d
+# Las claves están en el archivo .env (no se sube a git); ver .env.example.
+name: servicios-mandaditos              # nombre del grupo en Docker Desktop
+
+services:
+  postgres:                             # MDX-001: una base por System API
+    image: postgres:17                  # versión fija: se levanta igual cada vez
+    container_name: mandaditos-db-postgres
+    environment:
+      POSTGRES_USER: admin              # administrador (solo para ti, no para las APIs)
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}   # viene del archivo .env
+      CLIENTES_SAPI_PASSWORD: ${CLIENTES_SAPI_PASSWORD}   # las usa db/init/01-bases.sh
+      TIENDAS_SAPI_PASSWORD: ${TIENDAS_SAPI_PASSWORD}
+      CATALOGO_SAPI_PASSWORD: ${CATALOGO_SAPI_PASSWORD}
+      PEDIDOS_SAPI_PASSWORD: ${PEDIDOS_SAPI_PASSWORD}
+      PAGOS_SAPI_PASSWORD: ${PAGOS_SAPI_PASSWORD}
+      LOGISTICA_SAPI_PASSWORD: ${LOGISTICA_SAPI_PASSWORD}
+    ports:
+      - "5432:5432"                     # puerto del computador : puerto del contenedor
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data   # los datos sobreviven si se apaga el contenedor
+      - ./db/init:/docker-entrypoint-initdb.d     # scripts que corren solo la primera vez (volumen vacío)
+
+  activemq:                             # MDX-002: broker de mensajes
+    image: apache/activemq-classic:5.19.2
+    container_name: mandaditos-activemq
+    ports:
+      - "61616:61616"                   # puerta JMS: por aquí se conecta Mule
+      - "8161:8161"                     # consola web: http://localhost:8161/admin
+    volumes:
+      - datos-activemq:/opt/apache-activemq/data                       # los mensajes persistentes sobreviven al reinicio
+      - ./broker/activemq.xml:/opt/apache-activemq/conf/activemq.xml   # nuestra configuración del broker
+
+volumes:
+  datos-postgres:
+  datos-activemq:
