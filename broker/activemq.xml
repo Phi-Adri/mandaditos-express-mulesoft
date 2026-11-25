@@ -34,9 +34,92 @@
     <!-- MDX-002 (2026-11-25): schedulerSupport="true" enciende los mensajes diferidos (alarmas de 5 y 2 min, AMQ_SCHEDULED_DELAY). -->
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="${activemq.data}" schedulerSupport="true">
 
+        <!-- MDX-003: canales de la tabla (contratos/endpoints.md). Se crean al arrancar el broker. -->
+        <destinations>
+          <!-- Colas sueltas -->
+          <queue physicalName="pedidos.nuevos"/>
+          <queue physicalName="pedidos.respuestas"/>
+          <queue physicalName="pedidos.vencimientos"/>      <!-- alarma de 5 min -->
+          <queue physicalName="ofertas.vencimientos"/>      <!-- alarma de 2 min -->
+          <queue physicalName="pedidos.cierre"/>
+          <queue physicalName="pedidos.cerrado"/>
+          <queue physicalName="repartidores.ofertas"/>
+          <queue physicalName="catalogo.cargas"/>
+          <queue physicalName="monitoreo.pedidos"/>
+          <!-- Bus de control: una cola por pieza + respuestas -->
+          <queue physicalName="control.gestionar-pedido-papi"/>
+          <queue physicalName="control.gestionar-repartidor-papi"/>
+          <queue physicalName="control.liquidar-tiendas-papi"/>
+          <queue physicalName="control.portal-tiendas-eapi"/>
+          <queue physicalName="control.gestionar-catalogo-papi"/>
+          <queue physicalName="control.respuestas"/>
+          <!-- Temas (avisos.A = tienda de barrio del pedido 101, solo para el ejercicio) -->
+          <topic physicalName="avisos.A"/>
+          <topic physicalName="pedidos.entregas"/>
+          <topic physicalName="pedidos.estado"/>
+          <topic physicalName="pedidos.listo"/>
+          <topic physicalName="mensajes-muertos"/>
+          <!-- Colas que cuelgan de los temas (se llenan con destinationInterceptors) -->
+          <queue physicalName="avisos.A.gerente"/>
+          <queue physicalName="avisos.A.empleados"/>
+          <queue physicalName="pedidos.entregas.pedido"/>
+          <queue physicalName="pedidos.entregas.repartidor"/>
+          <queue physicalName="pedidos.estado.notificar"/>
+          <queue physicalName="pedidos.estado.portal"/>
+          <queue physicalName="pedidos.listo.repartidor"/>
+          <queue physicalName="mensajes-muertos.soporte"/>
+          <queue physicalName="mensajes-muertos.aviso"/>
+        </destinations>
+
+        <!-- MDX-003: cada tema deja una copia de cada mensaje en sus colas (publicación-suscripción).
+             Archivo fijo: cada tienda nueva necesita su avisos.{id_tienda} aquí y reiniciar el broker.
+             Con muchas tiendas, evaluar Virtual Topics (crean las colas solas). -->
+        <destinationInterceptors>
+          <virtualDestinationInterceptor>
+            <virtualDestinations>
+              <compositeTopic name="avisos.A">
+                <forwardTo>
+                  <queue physicalName="avisos.A.gerente"/>
+                  <queue physicalName="avisos.A.empleados"/>
+                </forwardTo>
+              </compositeTopic>
+              <compositeTopic name="pedidos.entregas">
+                <forwardTo>
+                  <queue physicalName="pedidos.entregas.pedido"/>
+                  <queue physicalName="pedidos.entregas.repartidor"/>
+                </forwardTo>
+              </compositeTopic>
+              <compositeTopic name="pedidos.estado">
+                <forwardTo>
+                  <queue physicalName="pedidos.estado.notificar"/>
+                  <queue physicalName="pedidos.estado.portal"/>
+                </forwardTo>
+              </compositeTopic>
+              <compositeTopic name="pedidos.listo">
+                <forwardTo>
+                  <queue physicalName="pedidos.listo.repartidor"/>
+                </forwardTo>
+              </compositeTopic>
+              <compositeTopic name="mensajes-muertos">
+                <forwardTo>
+                  <queue physicalName="mensajes-muertos.soporte"/>
+                  <queue physicalName="mensajes-muertos.aviso"/>
+                </forwardTo>
+              </compositeTopic>
+            </virtualDestinations>
+          </virtualDestinationInterceptor>
+        </destinationInterceptors>
+
         <destinationPolicy>
             <policyMap>
               <policyEntries>
+                <!-- MDX-003 (2026-11-25, decidido por ella): en todas las colas, un mensaje vencido se descarta y no va a ActiveMQ.DLQ.
+                     Solo afecta a los mensajes que traen tiempo de vida (hoy, el aviso de pedido nuevo de 5 min). -->
+                <policyEntry queue=">">
+                  <deadLetterStrategy>
+                    <sharedDeadLetterStrategy processExpired="false"/>
+                  </deadLetterStrategy>
+                </policyEntry>
                 <policyEntry topic=">" >
                     <!-- The constantPendingMessageLimitStrategy is used to prevent
                          slow topic consumers to block producers and affect other consumers
