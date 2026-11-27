@@ -108,7 +108,7 @@
 
 ### MDX-006 · clientes-sapi: crear el proyecto desde Exchange, su base de datos y la estructura de errores
 - Tipo: tarea
-- Estado: lista
+- Estado: en-curso
 - Puntos: 5
 - Sprint: 1
 - Épica: Preparar el terreno
@@ -124,7 +124,7 @@
   - [ ] En local la API exige `client_id` y `client_secret` en los encabezados (APIkit) y funciona con valores cualquiera; quedó anotado qué responde si faltan.
   - [ ] Hay pruebas MUnit en verde para un 404, un 500 y el correlation ID (con encabezado y sin él).
   - [ ] El manejo de errores quedó separado como plantilla, con una nota de cómo se agrega a una API nueva.
-- Notas: Puerto 8081. RAML: `../contratos/raml/system/clientes-sapi/`. Depende de MDX-001 y MDX-005. Reúne la antigua plantilla de errores y la antigua MDX-007 (pedido de ella, 2026-11-18). Decisiones C1 a C5 del plugin `construir-flujo` (errores globales por app + específicos por flujo, con la estructura `Error`); C6 abierta. Reglas 3, 8 y 9 de `../contratos/reglas-raml.md`. Client ID en local (contexto de `mulesoft-coach`, `videos/serie-1.md`, sesión 3): la política Client ID enforcement solo existe en API Manager con API Autodiscovery; en local el APIkit Router exige los encabezados del trait `seg-cliente`. ⚠️ Si faltan, probablemente responde 400 (no 401): confirmar con el esqueleto. 409 (2026-11-18): un solo trait `conflicto` con el tipo `Conflicto`; trae `objeto_actual` (Pedido, Oferta o Carga) solo cuando el objeto pudo cambiar antes; va solo en los endpoints que pueden dar 409 (no en `errores-comunes`). `clientes-sapi` no tiene 409: se prueba en la primera API que lo tenga. 5 puntos (aprobado el 2026-11-18).
+- Notas: Puerto 8081. RAML: `../contratos/raml/system/clientes-sapi/`. Depende de MDX-001 y MDX-005. Reúne la antigua plantilla de errores y la antigua MDX-007 (pedido de ella, 2026-11-18). Decisiones C1 a C5 del plugin `construir-flujo` (errores globales por app + específicos por flujo, con la estructura `Error`); C6 abierta. Reglas 3, 8 y 9 de `../contratos/reglas-raml.md`. Client ID en local (contexto de `mulesoft-coach`, `videos/serie-1.md`, sesión 3): la política Client ID enforcement solo existe en API Manager con API Autodiscovery; en local el APIkit Router exige los encabezados del trait `seg-cliente`. ⚠️ Si faltan, probablemente responde 400 (no 401): confirmar con el esqueleto. 409 (2026-11-18): un solo trait `conflicto` con el tipo `Conflicto`; trae `objeto_actual` (Pedido, Oferta o Carga) solo cuando el objeto pudo cambiar antes; va solo en los endpoints que pueden dar 409 (no en `errores-comunes`). `clientes-sapi` no tiene 409: se prueba en la primera API que lo tenga. 5 puntos (aprobado el 2026-11-18). Avance (2026-11-27, 16:37): workspace de Studio en `codigo/apis/` (decisión de ella; README actualizado). Proyecto `clientes-sapi` creado desde Exchange (1.0.0) dentro del workspace; el esqueleto trae `clientes-sapi.xml` con el listener en el puerto 8081 (viene así por defecto), el APIkit Router (`api="resource::…:clientes-sapi:1.0.0:raml:zip:clientes-sapi.raml"`), los flujos `main` y `console` y el flujo del `GET /clientes/{id_cliente}`. Falta comprobar que arranca (criterio 1) y que ella explique los archivos generados.
 
 ### MDX-007 · clientes-sapi: crear el proyecto desde Exchange y su base de datos
 - Tipo: tarea

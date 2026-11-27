@@ -73,7 +73,8 @@ Canal punto a punto, publicación-suscripción, identificador de correlación, i
 codigo/
   README.md
   .scrum/            seguimiento del trabajo (backlog, sprints, historial)
-  <api>/             un proyecto de Studio por API (se agregan a medida que se construyen)
+  apis/              workspace de Anypoint Studio con todos los proyectos (su configuración no se sube a git)
+    <api>/           un proyecto de Studio por API (se agregan a medida que se construyen)
 ```
 
 ## Contratos
