@@ -91,20 +91,20 @@
 
 ### MDX-005 · Publicar en Exchange los 6 RAML de System
 - Tipo: tarea
-- Estado: en-curso
+- Estado: hecha
 - Puntos: 3
 - Sprint: 1
 - Épica: Preparar el terreno
 - Creada: 2026-11-18
-- Cerrada: —
+- Cerrada: 2026-11-27
 - Historia: Como desarrolladora quiero los RAML de System publicados en Exchange para generar el esqueleto de cada app en Studio.
 - Criterios de aceptación:
   - [x] En los 6 RAML de System se cambiaron solo las líneas `uses:` y `!include` para apuntar a la dependencia `comun` 1.0.0 (las anotadas en MDX-004).
-  - [ ] Cada una de las 6 valida sin errores en Design Center.
-  - [ ] Las 6 están publicadas en Exchange (API `v1`, asset `1.0.0`).
-  - [ ] La copia de `contratos/raml/system/` es igual a lo publicado; si hubo que corregir algo, se corrigió primero en la carpeta.
-  - [ ] Desde Studio se encuentra al menos una de las 6 en Exchange (la usa MDX-007).
-- Notas: Fuente: `../contratos/raml/system/`. Requisito del plugin `construir-flujo` (C3: el esqueleto sale de Exchange). Regla aprobada por ella (2026-11-18): **la copia de la carpeta manda**; todo cambio se hace primero ahí, se valida y después se sube. **Depende de MDX-004: si la dependencia `comun` (opción A) no es posible, esta historia tampoco se puede hacer así y se evalúan las dos en su momento** (nota de ella). ⚠️ Con las rutas nuevas el plugin `validar-raml` puede dejar de encontrar `comun` (quizá necesite la dependencia descargada en local); si no se resuelve, cuenta la validación de Design Center. Estimada contra MDX-008 (mismo tamaño). Avance (2026-11-27): criterio 1 hecho. En las 6 se cambió solo el prefijo `../../comun/` por `exchange_modules/a86ab655-65d5-4626-afd0-4071cb9cea64/comun/1.0.0/` (56 líneas: clientes 5, logistica 8, pagos 9, tiendas 8, catalogo 10, pedidos 16) y no quedó ninguna ruta `../`. Respaldo previo en el scratchpad de la sesión. **Validación local resuelta:** se armó en el scratchpad una copia de cada API con `comun` dentro de `exchange_modules/<org>/comun/1.0.0/` (como lo hace Design Center) y el script de `validar-raml` dio 6 OK, 0 errores. La prueba negativa (la misma API sin `exchange_modules`) da error, así que la prueba sí revisa las rutas. Pasos para cada API en Design Center: Create → Import from File → el `.raml` de `contratos/raml/system/<api>/` (API specification, RAML 1.0, nombre = nombre de la API) → Exchange dependencies → agregar `comun` 1.0.0 → revisar que no haya marcas rojas (el aviso amarillo de la opción A es esperado) → Publish → asset version `1.0.0`, API version `v1`, Stable. Si Design Center pide corregir algo, se corrige primero en la carpeta.
+  - [x] Cada una de las 6 valida sin errores en Design Center.
+  - [x] Las 6 están publicadas en Exchange (API `v1`, asset `1.0.0`).
+  - [x] La copia de `contratos/raml/system/` es igual a lo publicado; si hubo que corregir algo, se corrigió primero en la carpeta.
+  - [x] Desde Studio se encuentra al menos una de las 6 en Exchange (la usa MDX-007).
+- Notas: Fuente: `../contratos/raml/system/`. Requisito del plugin `construir-flujo` (C3: el esqueleto sale de Exchange). Regla aprobada por ella (2026-11-18): **la copia de la carpeta manda**; todo cambio se hace primero ahí, se valida y después se sube. **Depende de MDX-004: si la dependencia `comun` (opción A) no es posible, esta historia tampoco se puede hacer así y se evalúan las dos en su momento** (nota de ella). ⚠️ Con las rutas nuevas el plugin `validar-raml` puede dejar de encontrar `comun` (quizá necesite la dependencia descargada en local); si no se resuelve, cuenta la validación de Design Center. Estimada contra MDX-008 (mismo tamaño). Avance (2026-11-27): criterio 1 hecho. En las 6 se cambió solo el prefijo `../../comun/` por `exchange_modules/a86ab655-65d5-4626-afd0-4071cb9cea64/comun/1.0.0/` (56 líneas: clientes 5, logistica 8, pagos 9, tiendas 8, catalogo 10, pedidos 16) y no quedó ninguna ruta `../`. Respaldo previo en el scratchpad de la sesión. **Validación local resuelta:** se armó en el scratchpad una copia de cada API con `comun` dentro de `exchange_modules/<org>/comun/1.0.0/` (como lo hace Design Center) y el script de `validar-raml` dio 6 OK, 0 errores. La prueba negativa (la misma API sin `exchange_modules`) da error, así que la prueba sí revisa las rutas. Pasos para cada API en Design Center: Create → Import from File → el `.raml` de `contratos/raml/system/<api>/` (API specification, RAML 1.0, nombre = nombre de la API) → Exchange dependencies → agregar `comun` 1.0.0 → revisar que no haya marcas rojas (el aviso amarillo de la opción A es esperado) → Publish → asset version `1.0.0`, API version `v1`, Stable. Si Design Center pide corregir algo, se corrige primero en la carpeta. Avance (2026-11-27, tarde): las 6 publicadas en Exchange (1.0.0, v1, Stable) sin cambios en Design Center, así que la copia de la carpeta es igual a lo publicado. Cada una publicó con avisos amarillos («functional warnings»), ninguno rojo. El número de avisos coincidió con las líneas cambiadas (clientes 5, logistica 8, pagos 9, tiendas 8, catalogo 10), salvo pedidos: 15 avisos para 16 líneas. Uno menos no es un aviso nuevo, así que no se investigó por qué. Criterio 5 hecho: `clientes-sapi` aparece en Studio (New Mule Project → Import a published API → from Exchange).
 
 ### MDX-006 · clientes-sapi: crear el proyecto desde Exchange, su base de datos y la estructura de errores
 - Tipo: tarea
