@@ -37,20 +37,20 @@
 
 ### MDX-003 · Crear en el broker las colas y temas de la tabla de canales
 - Tipo: tarea
-- Estado: en-curso
+- Estado: hecha
 - Puntos: 3
 - Sprint: 1
 - Épica: Preparar el terreno
 - Creada: 2026-11-18
-- Cerrada: —
+- Cerrada: 2026-11-25
 - Historia: Como desarrolladora quiero las colas y temas creados en el broker para que las apps puedan publicar y escuchar.
 - Criterios de aceptación:
   - [x] Están creados todos los canales de la tabla (copia abajo), y cada tema tiene sus colas colgadas: un mensaje publicado en el tema llega a todas ellas.
   - [x] `avisos.{id_tienda}` y `control.{pieza}` están creados para la tienda de prueba del pedido 101 y para cada pieza con cola de control (`endpoints.md`, paso 8 B).
   - [x] La configuración está en un archivo del repositorio: al levantar Docker de nuevo, los canales quedan iguales.
-  - [ ] Desde la consola web se ve cada canal.
+  - [x] Desde la consola web se ve cada canal.
   - [x] Se probó un tema: un mensaje publicado en `pedidos.estado` llegó a sus dos colas.
-- Notas: Depende de MDX-002 (cómo se cuelga una cola de un tema cambia según el broker; ⚠️ verificar en su documentación). Aquí se le explica cómo se montan y conectan colas y temas al desplegar (pedido suyo para la fase 4). Estimada contra MDX-008 (mismo tamaño). Copia de la tabla de canales (`endpoints.md`): Avance (2026-11-25): en `codigo/broker/activemq.xml`: `<destinations>` (24 canales al arrancar) y `<destinationInterceptors>` con 5 `compositeTopic` (avisos.A, pedidos.entregas, pedidos.estado, pedidos.listo, mensajes-muertos). Tienda de prueba `A` (como en los ejemplos; decidido por ella). Cola nueva propuesta por mí: `pedidos.listo.repartidor`. Vencidos: `processExpired="false"` en `policyEntry queue=">"` (decidido por ella: descartar). Prueba: 1 mensaje a `topic://pedidos.estado` → 1 en `pedidos.estado.notificar` y 1 en `pedidos.estado.portal`. Límite anotado: archivo fijo, cada tienda nueva necesita su tema y reiniciar; con muchas tiendas, evaluar Virtual Topics. Falta: que ella vea los canales en la consola.
+- Notas: Depende de MDX-002 (cómo se cuelga una cola de un tema cambia según el broker; ⚠️ verificar en su documentación). Aquí se le explica cómo se montan y conectan colas y temas al desplegar (pedido suyo para la fase 4). Estimada contra MDX-008 (mismo tamaño). Copia de la tabla de canales (`endpoints.md`): Avance (2026-11-25): en `codigo/broker/activemq.xml`: `<destinations>` (24 canales al arrancar) y `<destinationInterceptors>` con 5 `compositeTopic` (avisos.A, pedidos.entregas, pedidos.estado, pedidos.listo, mensajes-muertos). Tienda de prueba `A` (como en los ejemplos; decidido por ella). Cola nueva propuesta por mí: `pedidos.listo.repartidor`. Vencidos: `processExpired="false"` en `policyEntry queue=">"` (decidido por ella: descartar). Prueba: 1 mensaje a `topic://pedidos.estado` → 1 en `pedidos.estado.notificar` y 1 en `pedidos.estado.portal`. Límite anotado: archivo fijo, cada tienda nueva necesita su tema y reiniciar; con muchas tiendas, evaluar Virtual Topics. Falta: que ella vea los canales en la consola. Cerrada (2026-11-25): ella vio los canales en la consola e hizo el commit.
 
   | Canal | Tipo | Colas que cuelgan del tema |
   |---|---|---|
@@ -73,23 +73,25 @@
 
 ### MDX-004 · Publicar en Exchange los fragments comunes
 - Tipo: tarea
-- Estado: lista
+- Estado: hecha
 - Puntos: 3
 - Sprint: 1
 - Épica: Preparar el terreno
 - Creada: 2026-11-18
-- Cerrada: —
+- Cerrada: 2026-11-27
 - Historia: Como desarrolladora quiero los fragments de `raml/comun/` en Exchange para que los RAML de las APIs los usen desde ahí.
 - Criterios de aceptación:
-  - [ ] Se verificó en la documentación de MuleSoft cómo se publica un conjunto de fragments y cómo lo usa una API (tipo de asset y forma de la ruta), con la fuente anotada.
-  - [ ] `comun` está publicado en Exchange con versión `1.0.0`.
-  - [ ] Una API de prueba que lo usa como dependencia valida sin errores en Design Center, con al menos un tipo, un trait y un ejemplo.
-  - [ ] Se anotó qué líneas exactas cambiarán en los 15 RAML (el cambio se hace en MDX-005 para System; Process y Experience más adelante).
-- Notas: Fuente: `../contratos/raml/comun/`. **Decisión de ella (2026-11-18): opción A**, `comun` como un solo asset en Exchange que cada API declara como dependencia (mantiene «un solo tipo por objeto»; descartada la B, copiar `comun/` en cada API). Hoy los RAML usan rutas relativas (`../../comun/...`) que en Exchange no funcionan: solo cambian las líneas `uses:` y `!include`. Antes de publicar: confirmar si sobra `ejemplos/resultado-pedido.raml` (el tipo `ResultadoPedido` se eliminó el 2026-11-12). ⚠️ Forma de la ruta de la dependencia por verificar. Estimada contra MDX-008 (mismo tamaño).
+  - [x] Se verificó en la documentación de MuleSoft cómo se publica un conjunto de fragments y cómo lo usa una API (tipo de asset y forma de la ruta), con la fuente anotada.
+  - [x] `comun` está publicado en Exchange con versión `1.0.0`.
+  - [x] Una API de prueba que lo usa como dependencia valida sin errores en Design Center, con al menos un tipo, un trait y un ejemplo.
+  - [x] Se anotó qué líneas exactas cambiarán en los 15 RAML (el cambio se hace en MDX-005 para System; Process y Experience más adelante).
+- Resultado (2026-11-27): `prueba-clientes` valida sin errores rojos con la dependencia `comun` 1.0.0, ya sin las carpetas copiadas, usando el tipo `cli.Cliente`, los 3 traits y el ejemplo `cliente.raml`. Queda un **aviso amarillo** en cada ruta: «Detected non root dependency file reference … Only dependency main file should be used from dependant project», porque se entra a archivos que no son la raíz del asset (`tipos/base.raml`). No se encontró documentación oficial de ese aviso. Opciones: A aceptarlo; B una raíz que reúna todo (no sirve para los tipos de 8 librerías ni para los ejemplos); C un asset por fragmento (~30 assets). **Decisión de ella (2026-11-27): opción A**, se acepta el aviso. Si Studio falla al generar el esqueleto en MDX-006, se vuelve a esta decisión.
+- Líneas que cambian (criterio 4): en cada RAML, **solo** las líneas que empiezan con `../../comun/` (en `uses:`, `traits:` y los `!include` de ejemplos). Se reemplaza el prefijo `../../comun/` por `exchange_modules/a86ab655-65d5-4626-afd0-4071cb9cea64/comun/1.0.0/`, y el resto de la ruta queda igual. Además, cada API agrega la dependencia `comun` 1.0.0 en Design Center. Los archivos dentro de `comun` no se tocan: sus rutas internas viajan en el paquete. Cuántas líneas por API: System (MDX-005) clientes 5, logistica 8, pagos 9, tiendas 8, catalogo 10, pedidos 16 (56 en total); Process gestionar-repartidor 5, gestionar-tienda 7, realizar-pedido 8, gestionar-pedido 8, gestionar-catalogo 13 (41); Experience cadenas 4, app-repartidor 6, app-cliente 13, portal-tiendas 16 (39). Total 136. Ejemplo (`clientes-sapi`, líneas 13, 16, 17, 18 y 35): `cli: ../../comun/tipos/clientes.raml` → `cli: exchange_modules/a86ab655-65d5-4626-afd0-4071cb9cea64/comun/1.0.0/tipos/clientes.raml`. ⚠️ Con estas rutas, la copia local de la carpeta ya no valida sola con el plugin `validar-raml` (no existe `exchange_modules` en local); ver nota de MDX-005.
+- Notas: Fuente: `../contratos/raml/comun/`. **Decisión de ella (2026-11-18): opción A**, `comun` como un solo asset en Exchange que cada API declara como dependencia (mantiene «un solo tipo por objeto»; descartada la B, copiar `comun/` en cada API). Hoy los RAML usan rutas relativas (`../../comun/...`) que en Exchange no funcionan: solo cambian las líneas `uses:` y `!include`. Antes de publicar: confirmar si sobra `ejemplos/resultado-pedido.raml` (el tipo `ResultadoPedido` se eliminó el 2026-11-12). ⚠️ Forma de la ruta de la dependencia por verificar. Estimada contra MDX-008 (mismo tamaño). Avance (2026-11-25): `ejemplos/resultado-pedido.raml` NO sobra: lo usan `realizar-pedido-papi` y `app-cliente-eapi` (ejemplos de POST /pedidos con `pago.estado`). Documentación revisada: crear fragmento en Design Center (Create + → New Fragment, RAML 1.0, tipo) y publicar con Publish → Publish to Exchange, versión 1.0.0 (https://docs.mulesoft.com/design-center/design-create-publish-api-fragment); al publicar se excluyen por defecto los archivos que nadie referencia (https://docs.mulesoft.com/design-center/design-publish); la API lo agrega con Exchange dependencies y aparece en `exchange_modules/<group>/<asset>/<versión>/` (https://docs.mulesoft.com/design-center/design-add-api-dependency). ⚠️ Por comprobar en pantalla: si las carpetas se conservan al importar el zip y cómo evitar que se excluyan los archivos no referenciados. Avance (2026-11-26): el zip importado en Design Center **conserva las carpetas** (comprobado por ella; el proyecto quedó como `common`). Al abrirlo sale «Root file is not specified»: todo proyecto de fragmentos necesita un archivo raíz para publicarse; se pone con ⋮ junto al archivo → **Set as root file**, y puede ser cualquier fragmento, también una librería (https://docs.mulesoft.com/design-center/design-change-root-file). Archivos no referenciados desde la raíz: al publicar sale el diálogo «Publish unreferenced files?» con la casilla **Include unreferenced files** (visto en pantalla; la documentación no la nombra, https://docs.mulesoft.com/design-center/design-publish). Primera publicación quedó con asset ID `common` (renombrar el proyecto no cambia el asset ID; comprobado en `exchange.json`); el contenido descargado era idéntico (31 archivos). Ella creó un proyecto nuevo `comun` (Import from File, API specification fragment), raíz `tipos/base.raml`, casilla marcada, versión 1.0.0 Stable: `exchange.json` con `assetId: comun` y `groupId: a86ab655-65d5-4626-afd0-4071cb9cea64` (la organización). Borró el asset `common`. Exchange solo dibuja el archivo raíz; lo demás va en el paquete. Criterio 3 en curso (2026-11-26, se paró a las 19:00): proyecto `prueba-clientes` en Design Center con la dependencia `comun` 1.0.0 agregada (`exchange_modules` visible; `exchange.json` con la dependencia, classifier `raml`, packaging `zip`), pero todavía tiene copias sueltas de las carpetas de `comun` (se creó importando el zip), así que las rutas cortas leen la copia. Falta: ver la ruta exacta dentro de `exchange_modules`, cambiar las 5 líneas (`uses:`, 3 `traits:`, `!include` del ejemplo), borrar las 5 carpetas copiadas y comprobar que no hay errores. Revisar la marca roja que se vio cerca de la línea 23. Las dos páginas se contradicen sobre si se publican todos: comprobar en Exchange después de publicar que están los 36.
 
 ### MDX-005 · Publicar en Exchange los 6 RAML de System
 - Tipo: tarea
-- Estado: lista
+- Estado: en-curso
 - Puntos: 3
 - Sprint: 1
 - Épica: Preparar el terreno
@@ -97,12 +99,12 @@
 - Cerrada: —
 - Historia: Como desarrolladora quiero los RAML de System publicados en Exchange para generar el esqueleto de cada app en Studio.
 - Criterios de aceptación:
-  - [ ] En los 6 RAML de System se cambiaron solo las líneas `uses:` y `!include` para apuntar a la dependencia `comun` 1.0.0 (las anotadas en MDX-004).
+  - [x] En los 6 RAML de System se cambiaron solo las líneas `uses:` y `!include` para apuntar a la dependencia `comun` 1.0.0 (las anotadas en MDX-004).
   - [ ] Cada una de las 6 valida sin errores en Design Center.
   - [ ] Las 6 están publicadas en Exchange (API `v1`, asset `1.0.0`).
   - [ ] La copia de `contratos/raml/system/` es igual a lo publicado; si hubo que corregir algo, se corrigió primero en la carpeta.
   - [ ] Desde Studio se encuentra al menos una de las 6 en Exchange (la usa MDX-007).
-- Notas: Fuente: `../contratos/raml/system/`. Requisito del plugin `construir-flujo` (C3: el esqueleto sale de Exchange). Regla aprobada por ella (2026-11-18): **la copia de la carpeta manda**; todo cambio se hace primero ahí, se valida y después se sube. **Depende de MDX-004: si la dependencia `comun` (opción A) no es posible, esta historia tampoco se puede hacer así y se evalúan las dos en su momento** (nota de ella). ⚠️ Con las rutas nuevas el plugin `validar-raml` puede dejar de encontrar `comun` (quizá necesite la dependencia descargada en local); si no se resuelve, cuenta la validación de Design Center. Estimada contra MDX-008 (mismo tamaño).
+- Notas: Fuente: `../contratos/raml/system/`. Requisito del plugin `construir-flujo` (C3: el esqueleto sale de Exchange). Regla aprobada por ella (2026-11-18): **la copia de la carpeta manda**; todo cambio se hace primero ahí, se valida y después se sube. **Depende de MDX-004: si la dependencia `comun` (opción A) no es posible, esta historia tampoco se puede hacer así y se evalúan las dos en su momento** (nota de ella). ⚠️ Con las rutas nuevas el plugin `validar-raml` puede dejar de encontrar `comun` (quizá necesite la dependencia descargada en local); si no se resuelve, cuenta la validación de Design Center. Estimada contra MDX-008 (mismo tamaño). Avance (2026-11-27): criterio 1 hecho. En las 6 se cambió solo el prefijo `../../comun/` por `exchange_modules/a86ab655-65d5-4626-afd0-4071cb9cea64/comun/1.0.0/` (56 líneas: clientes 5, logistica 8, pagos 9, tiendas 8, catalogo 10, pedidos 16) y no quedó ninguna ruta `../`. Respaldo previo en el scratchpad de la sesión. **Validación local resuelta:** se armó en el scratchpad una copia de cada API con `comun` dentro de `exchange_modules/<org>/comun/1.0.0/` (como lo hace Design Center) y el script de `validar-raml` dio 6 OK, 0 errores. La prueba negativa (la misma API sin `exchange_modules`) da error, así que la prueba sí revisa las rutas. Pasos para cada API en Design Center: Create → Import from File → el `.raml` de `contratos/raml/system/<api>/` (API specification, RAML 1.0, nombre = nombre de la API) → Exchange dependencies → agregar `comun` 1.0.0 → revisar que no haya marcas rojas (el aviso amarillo de la opción A es esperado) → Publish → asset version `1.0.0`, API version `v1`, Stable. Si Design Center pide corregir algo, se corrige primero en la carpeta.
 
 ### MDX-006 · clientes-sapi: crear el proyecto desde Exchange, su base de datos y la estructura de errores
 - Tipo: tarea

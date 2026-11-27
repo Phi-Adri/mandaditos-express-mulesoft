@@ -16,6 +16,12 @@ Capacidad: 68 bloques (8 días completos + el 27-nov a medio tiempo; sin días n
 - Bloqueos: ninguno
 - Bloques: 5 + 0 (24-nov: 4, sin cronómetro, anotados a mano; 25-nov: 1 hasta la daily)
 
+### 2026-11-26
+- Hice: MDX-002 hecha (Classic 5.19 elegido, en el README) y MDX-003 hecha (24 colas y 5 temas en `activemq.xml`, vencidos se descartan); commits `MDX-001, MDX-002…` (25-nov 15:20) y `MDX-003…` (25-nov 16:55). Repaso Feynman de ActiveMQ: preguntas 1 a 4 bien; hoy, la 5 (servicio `activemq` del `docker-compose.yml`): `image` y `ports` bien, falta `volumes`.
+- Haré: terminar el repaso (`volumes` y pregunta 5), `activemq.xml` por bloques, y volver a MDX-004 (subir `comun.zip` a Design Center y comprobar carpetas y archivos no referenciados). Cuántos bloques: no sabe.
+- Bloqueos: ninguno. Nota: muchos bloques cortados por distracciones (temas familiares); hoy el primero se cortó cerca de una hora por el desayuno en familia.
+- Bloques: 25-nov por la tarde sin registrar. 26-nov (estimados por la hora del chat): 4 completos + 3 cortados; fuera de 12:12 a 14:14; pausa de 14:49 a 15:37; de 15:37 a 19:00, 2 completos + 3 cortados (huecos sin mensajes de 16:00 a 16:54 y de 18:00 a 18:58, por confirmar con ella). Total del día: 6 completos + 6 cortados.
+
 ## Impedimentos
 | # | Desde | Qué bloquea | Historia | Acción siguiente | Estado |
 |---|---|---|---|---|---|
